@@ -32,7 +32,7 @@ process annotate_vcf {
   each file(dbsnp) from dbsnp
 
   output:
-  file('*') into downloaded_files
+  file("${name}.vcf.gz") into annotated_vcf
 
   script:
   """
