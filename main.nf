@@ -51,6 +51,9 @@ process annotate_vcf {
       gzip -cdf $vcf > tmp.vcf && vcf=tmp.vcf
     fi
   fi
+  
+  # format chromosome names
+  awk '{gsub(/^chr/,""); print}' tmp.vcf > tmp.vcf 
 
   # bgzip uncompressed VCFs
   if [[ \$vcf == *.vcf ]]; then
