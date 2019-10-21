@@ -22,3 +22,5 @@ It is free for indivudal users to [sign-up](https://deploit.lifebit.ai/register)
 To run the pipeline, once logged in, you will first need to navigate to the pipelines page where you can import the pipeline:
 
 ![deploit](https://raw.githubusercontent.com/lifebit-ai/ecw-converter/master/images/deploit.png)
+
+See [example run](https://deploit.lifebit.ai/public/jobs/5dade42f43cc9700e1826166) of the pipeline on Deploit
