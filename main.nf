@@ -12,7 +12,7 @@
 Channel
   .fromPath(params.vcf)
   .ifEmpty { exit 1, "VCF file not found: ${params.vcf}" }
-  .map { file -> tuple(file.baseName, file) }
+  .map { file -> tuple(file.simpleName, file) }
   .set { vcf }
 Channel
   .fromPath(params.dbsnp)
