@@ -52,15 +52,14 @@ process annotate_vcf {
       gzip -cdf $vcf > tmp.vcf && vcf=tmp.vcf
     fi
   fi
+
+  awk '{gsub(/^chr/,""); print}' tmp.vcf > tmp.fm.vcf
   
-  # format chromosome names
-  awk '{gsub(/^chr/,""); print}' tmp.vcf > tmp.vcf 
+  # vcf_remapper.py --input_file \$vcf --output_file ${name}
+  # mv output/${name}.vcf ${name}.tmp.vcf
+  bgzip tmp.fm.vcf 
+  tabix -p vcf tmp.fm.vcf.gz
 
-  vcf_remapper.py --input_file \$vcf --output_file ${name}
-  mv output/${name}.vcf ${name}.tmp.vcf
-  bgzip ${name}.tmp.vcf
-  tabix -p vcf ${name}.tmp.vcf.gz
-
-  bcftools annotate -c CHROM,FROM,TO,ID -a ${dbsnp} -Oz -o ${name}.vcf.gz ${name}.tmp.vcf.gz
+  bcftools annotate -c CHROM,FROM,TO,ID -a ${dbsnp} -Oz -o ${name}.vcf.gz tmp.fm.vcf.gz
   """ 
 }

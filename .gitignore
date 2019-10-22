@@ -1,4 +1,5 @@
 .nextflow*
 work/
 results/
+*.vcf.gz*
 .DS_Store
