@@ -42,22 +42,21 @@ process annotate_vcf {
 
   vcf=$vcf
 
-  # check if input is bgzipped or gzipped
+  # uncompress bgzipped or gzipped input
   if [[ $vcf == *.gz ]]; then
     compression=\$(htsfile $vcf)
     if [[ \$compression == *"BGZF"* ]]; then
-      mv $vcf ${name}.tmp.vcf.gz && vcf=${name}.tmp.vcf.gz
+      bgzip -cdf $vcf > tmp.vcf && vcf=tmp.vcf
     elif [[ \$compression == *"gzip"* ]]; then
       gzip -cdf $vcf > tmp.vcf && vcf=tmp.vcf
     fi
   fi
 
-  # bgzip uncompressed VCFs
-  if [[ \$vcf == *.vcf ]]; then
-    bgzip -c \$vcf > ${name}.tmp.vcf.gz
-  fi
-
+  vcf_remapper.py --input_file \$vcf --output_file ${name}
+  mv output/${name}.vcf ${name}.tmp.vcf
+  bgzip ${name}.tmp.vcf
   tabix -p vcf ${name}.tmp.vcf.gz
+  
   bcftools annotate -c CHROM,FROM,TO,ID -a ${dbsnp} -Oz -o ${name}.vcf.gz ${name}.tmp.vcf.gz
   """ 
 }
