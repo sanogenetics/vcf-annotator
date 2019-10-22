@@ -18,6 +18,10 @@ Channel
   .fromPath(params.dbsnp)
   .ifEmpty { exit 1, "dbSNP file not found: ${params.dbsnp}" }
   .set { dbsnp }
+Channel
+  .fromPath(params.dbsnp_index)
+  .ifEmpty { exit 1, "dbSNP index file not found: ${params.dbsnp_index}" }
+  .set { dbsnp_index }
 
 /*--------------------------------------------------
   Annotate VCF
@@ -30,16 +34,13 @@ process annotate_vcf {
   input:
   set val(name), file(vcf) from vcf
   each file(dbsnp) from dbsnp
+  each file(dbsnp_index) from dbsnp_index
 
   output:
   file("${name}.vcf.gz") into annotated_vcf
 
   script:
   """
-  gzip -df $dbsnp
-  bgzip -c ${dbsnp.baseName} > $dbsnp
-  tabix -p vcf $dbsnp
-
   vcf=$vcf
 
   # uncompress bgzipped or gzipped input
@@ -56,7 +57,7 @@ process annotate_vcf {
   mv output/${name}.vcf ${name}.tmp.vcf
   bgzip ${name}.tmp.vcf
   tabix -p vcf ${name}.tmp.vcf.gz
-  
+
   bcftools annotate -c CHROM,FROM,TO,ID -a ${dbsnp} -Oz -o ${name}.vcf.gz ${name}.tmp.vcf.gz
   """ 
 }
