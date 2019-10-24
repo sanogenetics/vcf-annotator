@@ -37,7 +37,7 @@ process annotate_vcf {
   each file(dbsnp_index) from dbsnp_index
 
   output:
-  file("${name}.vcf.gz") into annotated_vcf
+  file("${name}.annotated.vcf.gz") into annotated_vcf
 
   script:
   """
@@ -61,5 +61,6 @@ process annotate_vcf {
   tabix -p vcf tmp.fm.vcf.gz
 
   bcftools annotate -c CHROM,FROM,TO,ID -a ${dbsnp} -Oz -o ${name}.vcf.gz tmp.fm.vcf.gz
+  bgzip -dfc ${name}.vcf.gz | gzip -c > ${name}.annotated.vcf.gz
   """ 
 }
