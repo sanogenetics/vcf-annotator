@@ -37,7 +37,7 @@ process annotate_vcf {
   each file(dbsnp_index) from dbsnp_index
 
   output:
-  file("${name}.annotated.vcf.gz") into annotated_vcf
+  file("${name}.annotated.vcf.*") into annotated_vcf
 
   script:
   """
@@ -51,6 +51,8 @@ process annotate_vcf {
     elif [[ \$compression == *"gzip"* ]]; then
       gzip -cdf $vcf > tmp.vcf && vcf=tmp.vcf
     fi
+  else 
+    cp $vcf tmp.vcf
   fi
 
   awk '{gsub(/^chr/,""); print}' tmp.vcf > tmp.fm.vcf
@@ -61,6 +63,8 @@ process annotate_vcf {
   tabix -p vcf tmp.fm.vcf.gz
 
   bcftools annotate -c CHROM,FROM,TO,ID -a ${dbsnp} -Oz -o ${name}.vcf.gz tmp.fm.vcf.gz
-  bgzip -dfc ${name}.vcf.gz | gzip -c > ${name}.annotated.vcf.gz
+  bgzip -dfc ${name}.vcf.gz 
+  cp ${name}.vcf.gz ${name}.annotated.vcf.gz
+  tabix -p vcf ${name}.annotated.vcf.gz
   """ 
 }
